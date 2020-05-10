@@ -56,7 +56,7 @@ public class StdSudokuGrid extends SudokuGrid
     		if(linePositionInFile == MAZE_SIZE_LINE_POSITION) {
     			//construct the game sizes.
     			
-    			System.out.println("DEBUG: size" + parseLine);
+    			//System.out.println("DEBUG: size" + parseLine);
     			int parsedMazeSize = Integer.parseInt(parseLine);
     			//set the gridSize variable
     			gridSize = parsedMazeSize;
@@ -67,13 +67,13 @@ public class StdSudokuGrid extends SudokuGrid
 
     		}else if(linePositionInFile == VALID_SYMBOLS_LINE_POSITION) {
     			//set valid symbols
-    			System.out.println("DEBUG: symbols" + parseLine);
+    			//System.out.println("DEBUG: symbols" + parseLine);
     			splitString = parseLine.split(SYMBOL_DELIMITER);
     			for(int i = 0; i < symbols.length && i < splitString.length; ++i) {
     				symbols[i] = Integer.parseInt(splitString[i]);
     			}
     		}else if(linePositionInFile >= PRESET_VALUE_LINE_POSITION) {
-    			System.out.println("DEBUG: inserting preset" + parseLine);
+    			//System.out.println("DEBUG: inserting preset" + parseLine);
     			/*
     			 * example = 8,8 7
     			 * below parses and splits the string up to usable values to 
