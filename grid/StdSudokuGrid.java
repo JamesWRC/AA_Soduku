@@ -21,15 +21,19 @@ public class StdSudokuGrid extends SudokuGrid
 	//hold the size of grid, ie if grid is 4x4 then gridSize = 4
 	private int gridSize = 0;
 	//hold the valid symbols allowed to be used in the maze
-	private int[] symbols;
-	//the gameboard that will hold all values
-	private int[][] game;
+	private Integer[] symbols;
+	/*
+	 * The game board that will hold all values.  
+	 * Have chosen Integer over int as it is more efficient.
+	 *  
+	 */
+	private Integer[][] game;
     public StdSudokuGrid() {
         super();
         //set up an initial 0 sized array of allowed symbols
-        symbols = new int[gridSize];
+        symbols = new Integer[gridSize];
         //set up the game board which is initially 0*0
-        game = new int[gridSize][gridSize];
+        game = new Integer[gridSize][gridSize];
     } // end of StdSudokuGrid()
 
 
@@ -62,8 +66,8 @@ public class StdSudokuGrid extends SudokuGrid
     			gridSize = parsedMazeSize;
     			
     			//construct the game with the proper sizes.
-    			symbols = new int[parsedMazeSize];
-    			game = new int[parsedMazeSize][parsedMazeSize];
+    			symbols = new Integer[parsedMazeSize];
+    			game = new Integer[parsedMazeSize][parsedMazeSize];
 
     		}else if(linePositionInFile == VALID_SYMBOLS_LINE_POSITION) {
     			//set valid symbols
@@ -78,7 +82,9 @@ public class StdSudokuGrid extends SudokuGrid
     			 * example = 8,8 7
     			 * below parses and splits the string up to usable values to 
     			 * then insert into the game, as preset value constraints.
+    			 * 
     			 */
+    			
     			splitString = parseLine.split(SYMBOL_DELIMITER);
     			String[] coordinates = splitString[0].split(",");
     			int xCoordinate = Integer.parseInt(coordinates[0]);
@@ -94,23 +100,40 @@ public class StdSudokuGrid extends SudokuGrid
     public void outputGrid(String filename)
         throws FileNotFoundException, IOException
     {
-        // TODO
+    	BufferedWriter writeToOutFile = new BufferedWriter(new FileWriter(filename));
+    	writeToOutFile.write(toString());
+    	writeToOutFile.close();
+     
     } // end of outputBoard()
 
 
     @Override
     public String toString() {
-        // TODO
+    	
+    	/*	Build the string to print out
+    	/*	- String builder is much fast for string concat'ing a string.
+    	 * 	
+    	 */
+    	StringBuilder builder = new StringBuilder();
+    	for(int i=0; i<game.length; ++i) {
+    		for(int j=0; j<game.length; ++j) {
+    			builder.append(game[i][j]);
 
-        // placeholder
-        return String.valueOf("");
+    			if(j<game.length-1) {
+    				builder.append(", ");
+    			}else {
+    				builder.append("\n");
+    			}
+    		}
+    	}
+        return String.valueOf(builder);
     } // end of toString()
 
 
     @Override
     public boolean validate() {
         // TODO
-
+    	
         // placeholder
         return false;
     } // end of validate()
