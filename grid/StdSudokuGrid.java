@@ -95,6 +95,7 @@ public class StdSudokuGrid extends SudokuGrid
     		}
     		++linePositionInFile;
     	}
+    	scanner.close();
     }// end of initBoard()
     @Override
     public void outputGrid(String filename)
@@ -119,6 +120,8 @@ public class StdSudokuGrid extends SudokuGrid
     		for(int j=0; j<game.length; ++j) {
     			builder.append(game[i][j]);
 
+    			//apply commas after all except last in row, 
+    			//the one at the end will add a line break
     			if(j<game.length-1) {
     				builder.append(", ");
     			}else {
