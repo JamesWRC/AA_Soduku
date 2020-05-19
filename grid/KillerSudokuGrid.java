@@ -204,8 +204,12 @@ public class KillerSudokuGrid extends SudokuGrid
 
 
 	@Override
-	public boolean verifyCell(int x, int y, int boxIDx, int boxIDy) {
+	public boolean verifyCell(int x, int y, int boxIDx, int boxIDy, Integer cellToPlace) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+
+
+
 } // end of class KillerSudokuGrid
