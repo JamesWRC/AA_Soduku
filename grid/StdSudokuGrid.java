@@ -123,7 +123,7 @@ public class StdSudokuGrid extends SudokuGrid
     			//apply commas after all except last in row, 
     			//the one at the end will add a line break
     			if(j<game.length-1) {
-    				builder.append(", ");
+    				builder.append(",");
     			}else {
     				builder.append("\n");
     			}
@@ -135,21 +135,78 @@ public class StdSudokuGrid extends SudokuGrid
 
     @Override
     public boolean validate() {
-        // TODO
+        int gameSize = (int) Math.sqrt(getSize());
+    	int currX = 0;
+    	int currY = 0;
+    	int xLimit = gameSize;
+    	int yLimit = gameSize;
+    	boolean isValid = true;
+    	boolean boxIsValid = false;
+    	//ensure each box in the grid is valid 
+    	while(!boxIsValid) {
+			for(int index = 0; index < symbols.length; ++index) {
+				int cellCount = 0;
+				for(int y = currY; y < yLimit; ++y) {
+	    			for(int x = currX; x < xLimit; ++x) {	
+						if(symbols[index] == getCell(y,x)) {
+							cellCount++;
+						}						
+						//stopping condition. ie reached end of entire grid.
+						if(y == gridSize-1 && x == gridSize-1) {
+							boxIsValid = true;
+						}
+					}
+    			}
+				if(cellCount>1) {
+					System.out.println("Found a duplicate of: " + symbols[index] + "");
+					return false;
+				}
+			}
+			//set co-orodinates to move to next box in grid, left to right, top to bottom
+			if((currX + gameSize)<gridSize) {
+				xLimit+= gameSize;
+				currX+=gameSize;
+			}else if((currY + gameSize)<gridSize) {
+				currX = 0;
+				xLimit = gameSize;
+				yLimit+=gameSize;
+				currY+=gameSize;
+			}
+		}
     	
-        // placeholder
-        return false;
+		
+		//verify rows and columns are unique
+		for(int y = 0; y < gridSize; ++y) {
+			for(int x = 0; x < gridSize; ++x) {
+				//check Row
+				for(int i = 0; i < getSize(); ++i) {
+					if(getCell(x, y) == getCell(x, i) && i != y) {
+						System.out.println("Found a duplicate of: " + getCell(x, y) + " at position: " + x + "," + y);
+						return false;
+					}
+				}
+				//check Col
+				for(int i = 0; i < getSize(); ++i) {
+					if(getCell(x, y) == getCell(i, y) && i != x) {
+						System.out.println("Found a duplicate of: " + getCell(x, y) + " at position: " + x + "," + y);
+						return false;
+					}
+				}
+			}
+		}
+        return isValid;
     } // end of validate()
 
     @Override
     public Integer[] getSymbols() {
+    	//returns an array of valid symbols.
     	return symbols;
     }
 
 
 	@Override
 	public Cage[] getCages() {
-		//Doesn't have any cages.
+		//Doesn't have any cages as this is not the Killer sudoku.
 		return null;
 	}
 
@@ -170,6 +227,7 @@ public class StdSudokuGrid extends SudokuGrid
 
 	@Override
 	public int getSize() {
+		//returns the grid size.
 		return gridSize;
 	}
 
@@ -178,98 +236,29 @@ public class StdSudokuGrid extends SudokuGrid
 	public boolean verifyCell(int x, int y, int boxIDx, int boxIDy, Integer cellToPlace) {
 
 		int boxSize = (int) Math.sqrt(gridSize);
-		
+		//verify cell placement is not already in the box.
 		for(int l = 0; l < symbols.length; ++l) {
-			System.out.println(symbols[l]);
-		}
-		for(int l = 0; l < symbols.length; ++l) {
-			System.arraycopy(symbols, 0, symbols, 0, symbols.length);
 			int foundCount = 0;
 			for(int i = boxIDx; i < boxSize; ++i) {
 				for(int j = boxIDy; j < boxSize; ++j) {
-
 					if(getCell(i, j) == cellToPlace) {
-	    				System.out.println("\t\t\t BOX IS INVALID: " + getCell(i, j) + " @ " + x + "," + y);
-
 						return false;
-//						if(getCell(i, j) != null && symbols[l].equals(cellToPlace)) {
-//							System.out.println("found: " + symbols[l] + " at: " + j + "," + y);
-//
-//		    				++foundCount;
-//		    			}
-//						System.out.println("comparing: " + symbols[l] + " with " + cellToPlace + " count: " + foundCount );
-//
-//		    			if(foundCount>1) {
-//		    				System.out.println("\t\t\t BOX IS INVALID: " + getCell(i, j) + " @ " + x + "," + y);
-//		    				return false;
-//		    			}
 					}
 				}
 			}
 		}
-		
-		//check box
-//		System.out.println("CHECKING BOX");
-//		for(int index = 0; index < symbols.length; ++index) {
-//			int foundCount = 0;
-//			for(int i = boxIDx; i < boxSize; ++i) {
-//	    		for(int j = boxIDy; j < boxSize; ++j) {
-//	    			if(getCell(i, j) != null && symbols[index] != null && symbols[index].equals(cellToPlace)) {
-//	    				++foundCount;
-//	    			}
-//	    			if(foundCount>1) {
-//	    				System.out.println("\t\t\t BOX IS INVALID: " + getCell(i, j) + " @ " + x + "," + y);
-//	    				return false;
-//	    			}
-//	    		}
-//	    	}
-//		}
-//		System.out.println("CURRENT CELL: " + getCell(x,y));
-
-		System.out.println("CHECKING COL");
-		//check row
+		//check row for duplicate symbol
 		for(int i = 0; i < getSize(); ++i) {
-//			System.out.println("\t\t\t\t" + getCell(i, y));
-			System.out.println("checking cell: " + y + ","+ i + " --> " + getCell(i, y));
 			if(cellToPlace == getCell(i, y) && i != x) {
-				System.out.println("FOUND DUPE: " + getCell(x,y) + "at " + y + "," + i);
 				return false;
 			}
 		}
-		System.out.println("CHECKING ROW");
-
+		//check column for duplicate symbol
 		for(int i = 0; i < getSize(); ++i) {
-//			System.out.println("\t\t\t\t" + getCell(x, i));
-			System.out.println("checking cell: " + i + ","+ x + " --> " + getCell(x,i));
 			if(cellToPlace == getCell(x, i) && i != y) {
-				System.out.println("FOUND DUPE: " + getCell(x,i) + "at " + i + "," + x);
 				return false;
 			}
 		}
-//		for(int i = 0; i < getSize(); ++i) {
-//			System.out.println("\t\t\t\t" + getCell(i, y));
-//			System.out.println("checking cell: " + i + ","+ y);
-//
-//			if(getCell(y, i) != null && getCell(y, i) == getCell(x, y) && i != x) {
-//				System.out.println("\t\t\t COL IS INVALID: " + getCell(y, i));
-//
-//				return false;
-//			}
-//			
-//		}
-//		System.out.println("CHECKING ROW");
-//
-//		for(int i = 0; i < getSize(); ++i) {
-//			System.out.println("\t\t\t\t" + getCell(x, i));
-//			System.out.println("checking cell: " + x + ","+ i);
-//
-//			if(getCell(x, i) != null && getCell(x, i) == getCell(x, y) && i != y) {
-//				System.out.println("\t\t\t ROW IS INVALID: " + getCell(x, i));
-//
-//				return false;
-//			}
-//			
-//		}
 		return true;
 	}
 	
