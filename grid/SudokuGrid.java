@@ -62,4 +62,47 @@ public abstract class SudokuGrid
      */
     public abstract boolean validate();
 
+    /**
+     * gets the valid symbols we are allowed to use in the game.
+     * @return Integer[] array of valid symbols to use in game
+     */
+    public abstract Integer[] getSymbols();
+    
+    /**
+     * gets the cages that the game has.
+     * @return Cage[] array of cages that the game uses.
+     */
+	public abstract Cage[] getCages();
+	
+	/**
+	 * set the specified cell value.
+	 * @param x X-Coordinate of the cell
+	 * @param y Y-Coordinate of the cell
+	 * @param value value to set the cell to
+	 */
+	public abstract void setCell(Integer x, Integer y, Integer value);
+	
+	/**
+	 * returns the value at the specified cell in the game
+	 * @param x X-Coordinate of the cell
+	 * @param y Y-Coordinate of the cell
+	 */
+	public abstract Integer getCell(Integer x, Integer y);
+	
+	/**
+	 * gets the the size of the grid ie if 9*9 grid will return 9
+	 * since its a square.
+	 * @return size of grid
+	 */
+	public abstract int getSize();
+	/**
+	 * checks the rowm cols and current box to verify the placement of the cell.
+	 * @param x X-Coordinate of current cell to verify
+	 * @param y Y-Coordinate of current cell to verify
+	 * @param boxIDx starting X-Coordinate of box
+	 * @param boxIDy starting Y-Coordinate of box
+	 * @param cellToPlace the cell to be placed if valid
+	 * @return
+	 */
+	public abstract boolean verifyCell(int x, int y, int boxIDx, int boxIDy, Integer cellToPlace);
 } // end of abstract class SudokuGrid

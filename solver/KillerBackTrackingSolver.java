@@ -22,7 +22,8 @@ public class KillerBackTrackingSolver extends KillerSudokuSolver
     @Override
     public boolean solve(SudokuGrid grid) {
         // TODO: your implementation of a backtracking solver for Killer Sudoku.
-
+    	grid.getSymbols();
+    	grid.getCages();
         // placeholder
         return false;
     } // end of solve()
