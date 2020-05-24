@@ -17,6 +17,8 @@ public class AlgorXSolver extends StdSudokuSolver
 	private int totalNumRows = 0;
 	private int totalNumCols = 0;
 	private int symbolAmt = 0;
+	
+	private static final int NUM_OF_COL_CONSTRAINTS = 4;
     public AlgorXSolver() {
     	
         // TODO: any initialisation you want to implement.
@@ -25,6 +27,7 @@ public class AlgorXSolver extends StdSudokuSolver
 
     @Override
     public boolean solve(SudokuGrid grid) {
+    	
     	//set the size of boxes.
     	gameSize = (int) Math.sqrt(grid.getSize());
 
@@ -34,14 +37,14 @@ public class AlgorXSolver extends StdSudokuSolver
     	symbolAmt = grid.getSymbols().length;
     	//rows = (gameSize*gameSize) * gameSize
     	totalNumRows = (gridSize*gridSize) * gridSize;
-    	//cols = (gameSize*gameSize) * 4 <--num of col restrictions.
-    	totalNumCols = (gridSize*gridSize) * 4;
+    	//cols = (gameSize*gameSize) * NUM_OF_COL_CONSTRAINTS (4) <--num of col restrictions.
+    	totalNumCols = (gridSize*gridSize) * NUM_OF_COL_CONSTRAINTS;
     	
     	//empty binary matrix, ready to be constructed by the buildMatrix method.
     	Integer[][] matrix = new Integer[totalNumRows][totalNumCols];
     	matrix = buildMatrix(matrix);		
     	
-    	//Binary matrix constrsucted! Ready to solve!!
+    	//Binary matrix constructed! Ready to solve!!
     	
     	
     	
