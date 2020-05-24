@@ -19,6 +19,9 @@ public class AlgorXSolver extends StdSudokuSolver
 	private int symbolAmt = 0;
 	
 	private static final int NUM_OF_COL_CONSTRAINTS = 4;
+	private static final Integer POSSIBLE_SET = 1;
+	private static final Integer EMPTY = null;
+
     public AlgorXSolver() {
     	
         // TODO: any initialisation you want to implement.
@@ -55,8 +58,9 @@ public class AlgorXSolver extends StdSudokuSolver
 
     
     
-    public Integer[][] buildMatrix(Integer[][] matrix){
+    private Integer[][] buildMatrix(Integer[][] matrix){
     	//this function builds the matrix of 1s or nulls.
+    	
     	//boxNumbers is used to get the box number based off coordinates in the grid.
     	int[][] boxNumbers = new int[gameSize][gameSize];
     	
@@ -93,14 +97,14 @@ public class AlgorXSolver extends StdSudokuSolver
     		for(int col = 0; col < gridSize; ++col) {
 
     			for(int cell = 0; cell < symbolAmt; ++cell) {
-            		matrix[count][cellCount] = 1;
-            		matrix[count][(row*gridSize)+rowConstraintOffset+cell] = 1;
-            		matrix[count][colCount+colConstraintStart] = 1;
+            		matrix[count][cellCount] = POSSIBLE_SET;
+            		matrix[count][(row*gridSize)+rowConstraintOffset+cell] = POSSIBLE_SET;
+            		matrix[count][colCount+colConstraintStart] = POSSIBLE_SET;
             		/*	Get the box number to offset.
             		 * 	- Scanning from top to bottom of grid, left to right 
             		 */
             		int boxNumber = boxNumbers[(int) Math.floor(row/gameSize)][(int) Math.floor(col/gameSize)];
-            		matrix[count][boxConstraintStart+cell+((boxNumber)*symbolAmt)] = 1;
+            		matrix[count][boxConstraintStart+cell+((boxNumber)*symbolAmt)] = POSSIBLE_SET;
 	    			++count;
 	        		++colCount;
             	}
@@ -116,7 +120,7 @@ public class AlgorXSolver extends StdSudokuSolver
     	//rows = (gameSize*gameSize) * gameSize
     	int totalNumRows = (gridSize*gridSize) * gridSize;
     	//cols = (gameSize*gameSize) * 4 <--num of col restrictions.
-    	int totalNumCols = (gridSize*gridSize) * 4;
+    	int totalNumCols = (gridSize*gridSize) * NUM_OF_COL_CONSTRAINTS;
     	StringBuilder builder = new StringBuilder();
     	for(int i=0; i<totalNumRows; ++i) {
     		for(int j=0; j<totalNumCols; ++j) {
