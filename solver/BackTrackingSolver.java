@@ -42,6 +42,8 @@ public class BackTrackingSolver extends StdSudokuSolver
     } // end of solve()
 
     
+   
+    
     public boolean recursiveBacktrack(SudokuGrid grid, int boxIDx, int boxIDy, 
     		int boxLimitx, int boxLimity, Integer[] symbols, int cellsInBoxLeft) {
     	//sudo code
@@ -116,8 +118,9 @@ public class BackTrackingSolver extends StdSudokuSolver
 	    for(int y = boxIDy; y < boxLimity ; ++y) {
 	    	for(int x = boxIDx; x < boxLimitx; ++x) {
 	    		//keep its own copy of where it is at to allow for multi-threading uses.
-//	    		Integer[] tempSymbols = new Integer[symbols.length];
-//    			System.arraycopy(symbols, 0, tempSymbols, 0, symbols.length);
+	    	
+	    		Integer[] tempSymbols = new Integer[symbols.length];
+    			System.arraycopy(symbols, 0, tempSymbols, 0, symbols.length);
     			if(grid.getCell(y, x) == null) {
 	    			for(int l = 0; l < symbols.length; l++) {
     	    			
@@ -136,19 +139,19 @@ public class BackTrackingSolver extends StdSudokuSolver
 	    	    				--cellsInBoxLeft;
 	    	    				grid.setCell(y, x, symbols[l]);
 
-//	    	    				tempSymbols[l] = null;
+	    	    				tempSymbols[l] = null;
 	    	    				symbols[l] = null;
 	    	    				
-//	    	    				isValid = recursiveBacktrack(grid, boxIDx, boxIDy, boxLimitx, boxLimity, tempSymbols, cellsInBoxLeft);
-	    	    				isValid = recursiveBacktrack(grid, boxIDx, boxIDy, boxLimitx, boxLimity, symbols, cellsInBoxLeft);
-
+	    	    				isValid = recursiveBacktrack(grid, boxIDx, boxIDy, boxLimitx, boxLimity, tempSymbols, cellsInBoxLeft);
+//	    	    				isValid = recursiveBacktrack(grid, boxIDx, boxIDy, boxLimitx, boxLimity, symbols, cellsInBoxLeft);
+	    	    				
 	    	    			
 	    	    				++cellsInBoxLeft;
 
 	    	    				if(!isValid){
 	    	    					grid.setCell(y, x, null);
 	    	    					
-//	    	    					tempSymbols[l] = tempCell;
+	    	    					tempSymbols[l] = tempCell;
 	    	    					symbols[l] = tempCell;	    	    					
 	    	    					if(l == symbols.length-1) {
 		    	    					grid.setCell(y, x, null);
