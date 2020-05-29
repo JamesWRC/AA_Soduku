@@ -46,6 +46,7 @@ public class AlgorXSolver extends StdSudokuSolver
     	totalNumCols = (gridSize*gridSize) * NUM_OF_COL_CONSTRAINTS;
     	
     	//empty binary matrix, ready to be constructed by the buildMatrix method.
+    	System.out.println("MROWS: " + totalNumRows + " MCOLS: " + totalNumCols);
     	Integer[][] matrix = new Integer[totalNumRows][totalNumCols];
     	matrix = buildMatrix(matrix, grid);		
     	
@@ -153,74 +154,96 @@ public class AlgorXSolver extends StdSudokuSolver
     }
     
     
-    private boolean recursiveSolve(Integer[][] matrix, SudokuGrid grid) {
+    private boolean recursiveSolve(Integer[][] matrix, SudokuGrid partialSolution) {
     	/*
     	 * check if grid is empty
     	 * if grid is not empty
     	 *		choose the FIRST column with the lowest number of 1s
-    	 *
+    	 * 	NOTES: NEED TO REMOVE ROWS TOO.
     	 */
     	System.out.println("\n\n\n");
     	System.out.println("OPTIONS");
     	System.out.println("gridSize: " + gridSize + " totalNumRows: " + totalNumRows + " totalNumCols: " + totalNumCols);
 
     	System.out.println("\n\n\n");
-    	
-    
+		System.out.println(partialSolution.toString());
+    	System.out.println("\n\n\n");
+    	printMatrix(matrix);
+    	boolean isValid = true;
+
     	for(int row = 0; row < totalNumRows; ++row) {
+    		int getRealY = 0;
     		for(int col = 0; col < totalNumCols; ++col) {
     			for(int cell = 0; cell < symbolAmt; ++cell) {
-	//    			//scans rows top to bottom, left to right of matrix.
-	//    			checkRowValidity(col, matrix);
-	//    			//scans cols top to bottom, left to right of matrix.
-	//    			checkColValidity(row, matrix);
-	    			
+	    			//set up getRealY
+//    				System.out.println("Val123: " + gridSize*symbolAmt);
+//    				System.out.println("symamnt: " + symbolAmt);
+//    				System.out.println("ColvAL: " + col);
+    				if(cell % symbolAmt == 0 && col != 0) {
+    					++getRealY;
+    				}
+    				if(getRealY % gridSize == 0) {
+        				getRealY = 0;
+        			}
+    				
 	    			//need to copy the column and row.
-	    			Integer[] tempRow = copyRow(col, matrix);
-	    			Integer[] tempCol = copyCol(row, matrix);
+	    			Integer[] tempRow = copyRow(row, matrix);
+	    			Integer[] tempCol = copyCol(col, matrix);
 
-//	    			
 //	    			System.out.println("row: " + row + ", col: " + col + " | cell: "+ cell);
-	    			//check if row has a 1 in it, then it is valid.
-	    			//only need to check if the col OR the row is valid. Checking row will be less time on larger grids.
 
-
-	    			if(arrayIsVallid(tempRow)) {
-	    				
+//    				System.out.println("x: " + getRealX + " y: " + getRealY + " cell: " + cell);
+	    			
+	    			/*	
+	    			 * 	Check if row has a 1 in it, then it is valid.
+	    			 *	We only need to check if the column OR the row is valid. Checking row will be less time on larger grids.
+	    			 *	If any 1s are found in the selected row it will also purge / nullify the respective column.
+	    			 */
+	    			if(validateRowAndPurgeCols(tempRow, matrix)) {
+	    				System.out.println("FOUD VALID");
 	    		    	int tempX = 0;
 	    		    	int tempY = 0;
-		    			for(int x = 0; x < gridSize; ++x) {
-	    		    		for(int y = 0; y < gridSize; ++y) {
-	    		    			if(grid.getCell(x, y) == null) {
-	    		    				grid.setCell(x, y, cell);
-	    		    				tempX = x;
-	    		    				tempY = y;
-	    		    			}
-	    		    		}
+//	    		    	boolean addedToPartialSolution = false;
+//		    			for(int x = 0; x < gridSize; ++x) {
+//	    		    		for(int y = 0; y < gridSize; ++y) {
+//	    		    			if(partialSolution.getCell(x, y) == null) {
+//	    		    				partialSolution.setCell(x, y, cell);
+//	    		    				tempX = x;
+//	    		    				tempY = y;
+//	    		    				addedToPartialSolution = true;
+//	    		    				break;
+//	    		    			}
+//	    		    		}
+//	    		    		if(addedToPartialSolution) {
+//	    		    			break;
+//	    		    		}
+//	    		    	}
+		    			int getRealX = (int) Math.floor(row/(gridSize*symbolAmt));
+
+    		    		System.out.println("setting cell @ " + getRealY + ", " + getRealX + " --> " + cell);
+
+	    		    	if(partialSolution.getCell(getRealY, getRealX) == null) {
+		    				partialSolution.setCell(getRealY, getRealX, cell);
 	    		    	}
-	    				
-	    				
-//	    				grid.setCell(xPos, yPos, cell);
-    				
-    				
-    				//go down 1 level
-//    				if(!recursiveSolve(matrix, grid)) {
-//    					//unset everything set here.
-//	    				
-		    			//unset the cell at the given positon
-		    			grid.setCell(tempX, tempY, null);
-		    			
-//	    				
-//	    				
-//    				}
+		    			//now that we have added the possible row to the partial solution, delete the row and col
+		    			System.out.println("Nullify");
+		    			nullifyRow(row, matrix);
+		    			nullifyCol(col, matrix);
+		    			isValid = recursiveSolve(matrix, partialSolution);
+//	    				go down 1 level
+	    				if(!isValid) {				
+			    			//Unsent the cell at the given position
+	    					partialSolution.setCell(getRealX, getRealY, null);
+			    			
+			    			//need to repair the row and columns
+			    			repairRow(col, matrix, tempRow);
+			    			repairCol(row, matrix, tempCol);
+	    				}
 	    			}
     			}
-
     		}
-
     	}
-    	
-    	return false;
+    	return true;
     }
     
     //copy the row to a temp array and return the row
@@ -238,21 +261,60 @@ public class AlgorXSolver extends StdSudokuSolver
     private Integer[] copyCol(int colPos, Integer[][] matrix) {
     	Integer[] retCol = new Integer[totalNumRows];
     	//copy row
+    	
 		for(int row = 0; row < totalNumRows; ++row) {
 			retCol[row] = matrix[row][colPos];
 		}
 		return retCol;
 	}
     
-    //simply check if the array has any 1s, if so then its true.
-    private boolean arrayIsVallid(Integer[] array) {
+    // simply check if the array has any 1s, if so then its true.
+    // Nullify operation to remove all 1s every column where a 1 is in the row.
+
+    private boolean validateRowAndPurgeCols(Integer[] array, Integer[][] matrix) {
+    	boolean isValid = false;
     	for(int i = 0; i < array.length; ++i) {
-    		if(array[i] == POSSIBLE_SET) {
-    			return false;
+    		if(array[i] == POSSIBLE_SET) {	
+    			//purge columns if a 1 is found
+    			nullifyCol(i, matrix);
+    			isValid = true;
     		}
     	}
-    	return true;
+    	return isValid;
     }
+    
+    
+    // # # # Nullify the row / col # # #
+
+    //nullify the row 
+    private void nullifyRow(int rowPos, Integer[][] matrix) {
+		for(int col = 0; col < totalNumCols; ++col) {
+	    	matrix[rowPos][col] = null;;
+		}
+	}
+    
+    //nullify the column.
+    private void nullifyCol(int colPos, Integer[][] matrix) {
+		for(int row = 0; row < totalNumRows; ++row) {
+			matrix[row][colPos] = null;;
+		}
+	}
+    
+    // # # # replace the array back to the grid # # #
+    
+    //crepair the row in the matrix that was removed.
+    private void repairRow(int rowPos, Integer[][] matrix, Integer[] array) {
+    	//repair the matrix
+		for(int col = 0; col < totalNumCols; ++col) {
+			 matrix[rowPos][col] = array[col];
+		}
+	}
+    //repair the col in the matrix that was removed.
+    private void repairCol(int colPos, Integer[][] matrix, Integer[] array) {
+		for(int row = 0; row < totalNumRows; ++row) {
+			matrix[row][colPos] = array[row];
+		}
+	}
 
 		
 } // end of class AlgorXSolver
