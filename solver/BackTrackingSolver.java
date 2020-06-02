@@ -37,8 +37,8 @@ public class BackTrackingSolver extends StdSudokuSolver
     	Integer[] symbols = grid.getSymbols();
     	//Integer[] symbols = null;
     	int cellsInBoxLeft = -1;
-    	
-        return recursiveBacktrack(grid, boxIDx, boxIDy, boxLimitx, boxLimity, symbols, cellsInBoxLeft);
+    	recursiveBacktrack(grid, boxIDx, boxIDy, boxLimitx, boxLimity, symbols, cellsInBoxLeft);
+        return grid.validate();
     } // end of solve()
 
     
@@ -76,7 +76,6 @@ public class BackTrackingSolver extends StdSudokuSolver
             	//set up the number of cells to left to fill in each box (sub box of the grid)
         		cellsInBoxLeft = 0;
         	}else {
-        		System.out.println(grid.toString());
         		//re sizes the boxes throughout the grid.
 	        	if((boxIDx + gameSize)<grid.getSize()) {
 	    			boxLimitx+= gameSize;

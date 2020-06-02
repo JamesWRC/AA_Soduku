@@ -60,10 +60,8 @@ public class AlgorXSolver extends StdSudokuSolver
     	int col = 0;
     	boolean isValid = false;
     	isValid = recursiveSolve(row, col, count, colCount, matrix, grid);
-    
-    	System.out.println("Real grid: \n" + grid.toString());
-
-    	return isValid;
+   
+    	return grid.validate();
     } // end of solve()
 
     
@@ -120,7 +118,7 @@ public class AlgorXSolver extends StdSudokuSolver
 	            		matrix[count][boxConstraintStart+cell+((boxNumber)*symbolAmt)] = POSSIBLE_SET;
 //    				}else {
     					if(grid.getCell(row, col) == grid.getSymbols()[cell]) {
-							System.out.println("ALREADY ENTERED: " + grid.getCell(row, col) + " @ x:" + col + " ,y: " + row);
+//							System.out.println("ALREADY ENTERED: " + grid.getCell(row, col) + " @ x:" + col + " ,y: " + row);
 							//nullifies the row.
     						for(int i = 0; i < totalNumCols; ++i) {
     		    				if(matrix[count][i] == POSSIBLE_SET) {
@@ -189,24 +187,15 @@ public class AlgorXSolver extends StdSudokuSolver
     	 * check if grid is empty
     	 * if grid is not empty
     	 *		choose the FIRST column with the lowest number of 1s
-    	 * 	NOTES: NEED TO REMOVE ROWS TOO.
+    	 * 	NOTES: Everything works fine. Could improve by NOT making a deep copy of the matrix every iteration.
     	 */
-    	System.out.println("\n\n\n");
-    	System.out.println("OPTIONS");
-    	System.out.println("gridSize: " + gridSize + " totalNumRows: " + totalNumRows + " totalNumCols: " + totalNumCols + " symbols: " + symbolAmt);
-
-    	System.out.println("\n\n\n");
-		System.out.println(partialSolution.toString());
-    	System.out.println("\n\n\n");
-    	printMatrix(matrix);
-    	System.out.println("\n\n\n");
 
     	Integer[][] usableMatrix = null;
-    	System.out.println("PRINTING USABLE");
+//    	System.out.println("PRINTING USABLE");
     	boolean isValid = true;
     	int count = currCount;
     	int colCount = currColCount;
-    	System.out.println("RECEIVED row: " + currRow + " RECEIVED col :" + currCol);
+//    	System.out.println("RECEIVED row: " + currRow + " RECEIVED col :" + currCol);
     	for(int row = currRow; row < gridSize; ++row) {
     		int getRealY = 0;
     		for(int col = currCol; col < gridSize; ++col) {
@@ -214,7 +203,7 @@ public class AlgorXSolver extends StdSudokuSolver
 	    			boolean colIsValid = false;
 	
 	    			for(int cell = 0; cell < symbolAmt; ++cell) {
-	    		    	System.out.println("TURNED row: " + row + " TURNED col :" + col + " cell: " + cell );
+//	    		    	System.out.println("TURNED row: " + row + " TURNED col :" + col + " cell: " + cell );
 	
 	    				
 	    				usableMatrix = copyMatrix(matrix);
@@ -232,7 +221,7 @@ public class AlgorXSolver extends StdSudokuSolver
 	    				
 		    			int getRealX = (int) Math.floor(count/(gridSize*symbolAmt));
 		    			//need to copy the column and row.
-		    			System.out.println("\n\t\t\t count: " + count + " colCount: " + colCount);
+//		    			System.out.println("\n\t\t\t count: " + count + " colCount: " + colCount);
 		    			Integer[] tempRow = copyRow(count, usableMatrix); // <-- this is correct
 	//	    			Integer[] tempCol = copyCol(getRealY, matrix);
 	//	    			Integer[] tempRow = copyRow(getRealY, matrix);
@@ -241,16 +230,16 @@ public class AlgorXSolver extends StdSudokuSolver
 		    			
 	
 		    			if(!colIsValid) {
-			    			System.out.println("\t\t\t\t\t Checking column! " + colIsValid);
+//			    			System.out.println("\t\t\t\t\t Checking column! " + colIsValid);
 			    			int index = 0;
 			    			for(int i = 0; i < tempCol.length; ++i) {
 	//		    				System.out.print(tempCol[i]);
 			    				if(tempCol[i] == POSSIBLE_SET) {
 			    					colIsValid = true;
-		    						System.out.println("A - i: " + i);
+//		    						System.out.println("A - i: " + i);
 	
 			    					if(index == 0) {
-			    						System.out.println("B - i: " + i);
+//			    						System.out.println("B - i: " + i);
 			    						index = i;
 			    						count = i;
 			    					}
@@ -265,7 +254,7 @@ public class AlgorXSolver extends StdSudokuSolver
 	//		    			Integer[] tempCol = copyCol(colCount, usableMatrix);
 	//		    			System.out.println("\n");
 			    			if(!colIsValid) {
-			    				System.out.println("breaking");
+//			    				System.out.println("breaking");
 				    			count += (symbolAmt - cell);
 				    			colCount++;
 				    			
@@ -279,10 +268,10 @@ public class AlgorXSolver extends StdSudokuSolver
 		    				col = 0;
 		    			}
 		    			possibleY = (possibleY % symbolAmt);
-		    			System.out.println("Possible Y: " + possibleY);
+//		    			System.out.println("Possible Y: " + possibleY);
 		    			
 		    			
-		    			System.out.println("colCount: " + count);
+//		    			System.out.println("colCount: " + count);
 	//	    			System.out.println("row: " + row + ", col: " + col + " | cell: "+ cell);
 	
 	//    				System.out.println("x: " + getRealX + " y: " + getRealY + " cell: " + cell);
@@ -293,26 +282,26 @@ public class AlgorXSolver extends StdSudokuSolver
 		    			 *	If any 1s are found in the selected row it will also purge / nullify the respective column.
 		    			 */
 	
-			    		System.out.println("Trying cell @ " + getRealX + ", " + possibleY + " celPos:  " + cell + " --> " + partialSolution.getSymbols()[cell]);
+//			    		System.out.println("Trying cell @ " + getRealX + ", " + possibleY + " celPos:  " + cell + " --> " + partialSolution.getSymbols()[cell]);
 			    		boolean isPlacementValid = cover(tempRow, tempCol, usableMatrix, cell);
-			    		System.out.println("Column Position: " + colCount);
-			    		System.out.println("is placement valid: " + isPlacementValid);
+//			    		System.out.println("Column Position: " + colCount);
+//			    		System.out.println("is placement valid: " + isPlacementValid);
 	
 		    			if(isPlacementValid) {
-		    				System.out.println("\tSetting cell @ " + getRealX + ", " + possibleY + " celPos:  " + cell + " --> " + partialSolution.getSymbols()[cell]);
+//		    				System.out.println("\tSetting cell @ " + getRealX + ", " + possibleY + " celPos:  " + cell + " --> " + partialSolution.getSymbols()[cell]);
 	
 	
 	    		    		Integer cellToSet = null;
-		    		    	if(partialSolution.getCell(getRealX, possibleY) == null) {
+//		    		    	if(partialSolution.getCell(getRealX, possibleY) == null) {
 		    		    		cellToSet = partialSolution.getSymbols()[cell];
-		    		    		System.out.println(partialSolution.getCell(getRealX, possibleY));
+//		    		    		System.out.println(partialSolution.getCell(getRealX, possibleY));
 			    				partialSolution.setCell(getRealX, possibleY, cellToSet);
-		    		    		System.out.println(partialSolution.getCell(getRealX, possibleY));
+//		    		    		System.out.println(partialSolution.getCell(getRealX, possibleY));
 			    				
-		    		    	}
+//		    		    	}
 		    		    	
 	//	    				printMatrix(matrix);
-		    				System.out.println(partialSolution.toString());
+//		    				System.out.println(partialSolution.toString());
 	//	    				System.exit(0);
 	//		    			//now that we have added the possible row to the partial solution, delete the row and col
 	//		    			System.out.println("Nullify");
@@ -322,8 +311,7 @@ public class AlgorXSolver extends StdSudokuSolver
 	////	    				go down 1 level
 		    				if(!isValid) {				
 				    			//Unsent the cell at the given position
-		    					partialSolution.setCell(row, col, null);
-				    			
+		    					partialSolution.setCell(getRealX, possibleY, null);				    			
 				    			//need to repair the row and columns
 	//			    			repairRow(col, matrix, tempRow);
 	//			    			repairCol(row, matrix, tempCol);
@@ -331,19 +319,18 @@ public class AlgorXSolver extends StdSudokuSolver
 		    					return true;
 		    				}
 		    				if(cell == partialSolution.getSymbols().length -1) {
-			    				System.out.println("returning false1231");
-		    					partialSolution.setCell(row, col, null);
-	
+//			    				System.out.println("returning false1231");
+			    				partialSolution.setCell(getRealX, possibleY, null);	
 			    				return false;
 			    			}
 	
 		    			}else {
-		    				System.out.println("FAILED PLACEMENT CHECK");
-		    				System.out.println("cell: " + cell + "symbol: " + (partialSolution.getSymbols().length -1));
+//		    				System.out.println("FAILED PLACEMENT CHECK");
+//		    				System.out.println("cell: " + cell + "symbol: " + (partialSolution.getSymbols().length -1));
 		    				if(cell == partialSolution.getSymbols().length -1) {
-			    				System.out.println("returning false1231");
-		    					partialSolution.setCell(row, col, null);
-		    					return false;
+//			    				System.out.println("returning false1231");
+			    				partialSolution.setCell(getRealX, possibleY, null);
+			    				return false;
 		    				}
 		    			}
 		    			++count;
@@ -406,14 +393,14 @@ public class AlgorXSolver extends StdSudokuSolver
     	int count = 0;
     	for(int i = 0; i < rowArray.length; ++i) {
     		
-    		System.out.print(rowArray[i]);
+//    		System.out.print(rowArray[i]);
     		if(rowArray[i] == POSSIBLE_SET) {
     			count++;
     		}
     	}
-		System.out.print("\n");
-		System.out.println("\t\t\tcount of 1s: " + count);
-		System.out.print("\n");
+//		System.out.print("\n");
+//		System.out.println("\t\t\tcount of 1s: " + count);
+//		System.out.print("\n");
 
 //    	for(int i = 0; i < colArray.length; ++i) {
 //    		System.out.print(colArray[i]);
@@ -423,7 +410,7 @@ public class AlgorXSolver extends StdSudokuSolver
     	if(count == 4) {
 	    	for(int i = 0; i < colArray.length; ++i) {
 	    		if(colArray[i] == POSSIBLE_SET) {	
-	        		System.out.println("COLINDEX index: " + i + " Cell: " + cell + " sum: " + (i+cell));
+//	        		System.out.println("COLINDEX index: " + i + " Cell: " + cell + " sum: " + (i+cell));
 
 	    			//purge columns if a 1 is found
 	    			nullifyRow(i+cell, matrix);
@@ -471,8 +458,8 @@ public class AlgorXSolver extends StdSudokuSolver
 
 //    		System.out.println("\ty: " + matrix[rowPos][col]);
 		}
-		System.out.println("ACBUEAJCKLU");
-		printMatrix(matrix);
+//		System.out.println("ACBUEAJCKLU");
+//		printMatrix(matrix);
 //		System.out.println("DNE");
 	}
     
