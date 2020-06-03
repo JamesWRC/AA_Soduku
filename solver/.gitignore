@@ -7,3 +7,5 @@
 /StdSudokuSolver.class
 /SudokuSolver.class
 /BackTrackingSolver$1.class
+/Node.class
+/ColumnNode.class
