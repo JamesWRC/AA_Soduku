@@ -195,9 +195,9 @@ public class DancingLinksSolver extends StdSudokuSolver
     	/*
     	 * NOTES: im botta go bed, good night girl ill see ya tomorrow.
     	 * 
-    	 * 		- Possibly contructed initial colNode linked list, not sure
+    	 * 		- Possibly constructed initial colNode linked list, not sure
     	 * 		- Need to continue building the list structure.
-    	 * 		- THEN need to actualy make it all work...
+    	 * 		- THEN need to actually make it all work...
     	 */
     	
     	int count = 0;
