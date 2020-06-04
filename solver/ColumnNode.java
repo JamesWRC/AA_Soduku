@@ -9,13 +9,14 @@ public class ColumnNode extends Node{
 	private ColumnNode left = null;							// 	References the Node to the left of this Node.
 	private ColumnNode right = null;						//	References the Node to the right of this Node.
 	
-	private LinkedList<Node> list; 					//	References the list this Node hold
+	private LinkedList<Node> list; 							//	References the list this Node hold
 	
 	private int numberOfOnes = 0;							//	The number of ones the columns has in it.
-	private int columnID = 0;								// 	The column number ID (name) this Node is in the cover 'matrix'.
-	
+	private int columnID = -1;								// 	The column number ID (name) this Node is in the cover 'matrix'.
+															//	Note: We need to initialize as a invalid id.	
 	public ColumnNode() {
 		list = new LinkedList<Node>();
+//		list.add(new Node());
 	}
 	
 	//	Returns the number of ones (nodes) in the column.
@@ -60,5 +61,10 @@ public class ColumnNode extends Node{
 	//	Return the list of Nodes this holds.
 	public LinkedList<Node> getList(){
 		return list;
+	}
+	
+	//	Set the list of Nodes this holds.
+	public void setList(LinkedList<Node> list){
+		this.list = list;
 	}
 }

@@ -143,6 +143,7 @@ public class AlgorXSolver extends StdSudokuSolver
     	 * 
     	 * 	NOTES:	- Everything works fine. Could improve by NOT making a deep copy of the matrix every iteration.
     	 *			- We use a nested for loop just to keep a structure of the grid. 
+    	 *			- NEED to improve on efficiency, but will comeback once others work
     	 */
 
     	Integer[][] usableMatrix = null;
