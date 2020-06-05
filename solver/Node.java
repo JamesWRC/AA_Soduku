@@ -54,7 +54,7 @@ public class Node {
 	}
 	
 	// 	Returns the reference to the colHead Node.
-	public ColumnNode colNode() {
+	public ColumnNode getColNode() {
 		return this.colNode;
 	}
 	

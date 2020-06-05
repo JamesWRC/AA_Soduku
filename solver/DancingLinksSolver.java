@@ -37,7 +37,6 @@ public class DancingLinksSolver extends StdSudokuSolver
     	possibleCells = new Integer[grid.getSymbols().length];
     	System.arraycopy(grid.getSymbols(), 0, possibleCells, 0, grid.getSymbols().length); 
     	LinkedList<ColumnNode> columnList = null;
-    	LinkedList<ColumnNode> coveredColumns = new LinkedList<ColumnNode>();
     	//set the size of boxes.
     	gameSize = (int) Math.sqrt(grid.getSize());
     	//set grid size
@@ -49,13 +48,13 @@ public class DancingLinksSolver extends StdSudokuSolver
     	//cols = (gameSize*gameSize) * NUM_OF_COL_CONSTRAINTS (4) <--num of col restrictions.
     	totalNumCols = (gridSize*gridSize) * NUM_OF_COL_CONSTRAINTS;
 
-    	translateMatrixToCircular2DDoublyLinkedList(grid, columnList); // bit of a long method, but it is descriptive.
+    	columnList = translateMatrixToCircular2DDoublyLinkedList(columnList); // bit of a long method, but it is descriptive.
 //    	printColumnNodes(columnList);
-    	recursiveSolve(columnList, coveredColumns);
+    	recursiveSolve(columnList, grid);
         return false;
     } // end of solve()
     
-	private LinkedList<ColumnNode> translateMatrixToCircular2DDoublyLinkedList(SudokuGrid grid, LinkedList<ColumnNode> columnList) {
+	private LinkedList<ColumnNode> translateMatrixToCircular2DDoublyLinkedList(LinkedList<ColumnNode> columnList) {
     	
     	//	Construct the 2D LinkedList.
     	columnList = new LinkedList<ColumnNode>();
@@ -196,30 +195,78 @@ public class DancingLinksSolver extends StdSudokuSolver
             		boxNode.setRowPosition(rowNumber);
             		
             		//	If the column is empty then set the 'down' reference to the current node.
+            		/*
+            		 *	Operations in the below if statements:
+            		 *	BEGIN
+            		 *		IF linked list in the columnNode is empty:
+            		 *			SET columnNode 'down' reference to the current Node.
+            		 *			SET current Node 'up' reference to the columnNode
+            		 *			SET current Node 'down' reference to the columnNode.
+            		 *		ELSE
+            		 *			SET columnNode 'up' referenced Nodes 'down' reference to the current Node.
+            		 *			SET current Node 'up' reference to the columnNodes 'up' referenced Node.
+            		 *			SET current Node 'down' reference to the columnNode.
+            		 *	END
+            		 *	
+            		 *	- These operations make the columns a circular doubly linked list.
+            		 */
+            		
+            		//	Construct the references for cellNode and cellConstraintColumn.
             		if(cellConstraintColumn.getList().isEmpty()) {
             			cellConstraintColumn.setDown(cellNode);
+            			cellNode.setUp(cellConstraintColumn);
+            			cellNode.setDown(cellConstraintColumn);
+            		}else {
+            			cellConstraintColumn.getUp().setDown(cellNode);
+            			cellNode.setUp(cellConstraintColumn.getUp());
+            			cellNode.setDown(cellConstraintColumn);
             		}
+            		
+            		//	Construct the references for rowNode and rowConstraintColumn.
             		if(rowConstraintColumn.getList().isEmpty()) {
             			rowConstraintColumn.setDown(rowNode);
+            			rowNode.setUp(rowConstraintColumn);
+            			rowNode.setDown(rowConstraintColumn);
+            		}else {
+            			rowConstraintColumn.getUp().setDown(rowNode);
+            			rowNode.setUp(rowConstraintColumn.getUp());
+            			rowNode.setDown(rowConstraintColumn);
             		}
+            		
+            		//	Construct the references for colNode and colConstraintColumn.
             		if(colConstraintColumn.getList().isEmpty()) {
             			colConstraintColumn.setDown(colNode);
+            			colNode.setUp(colConstraintColumn);
+            			colNode.setDown(colConstraintColumn);
+            		}else {
+            			colConstraintColumn.getUp().setDown(colNode);
+            			colNode.setUp(colConstraintColumn.getUp());
+            			colNode.setDown(colConstraintColumn);
             		}
+            		
+            		//	Construct the references for boxNode and boxConstraintColumn.
 					if(boxConstraintColumn.getList().isEmpty()) {
 						boxConstraintColumn.setDown(boxNode);
+						boxNode.setUp(boxConstraintColumn);
+						boxNode.setDown(boxConstraintColumn);
+					}else {
+						boxConstraintColumn.getUp().setDown(boxNode);
+						boxNode.setUp(boxConstraintColumn.getUp());
+						boxNode.setDown(boxConstraintColumn);
 					}
-					
-            		//	Add the nodes to their respective column lists.
-            		cellConstraintColumn.getList().add(cellNode);
-            		rowConstraintColumn.getList().add(rowNode);
-            		colConstraintColumn.getList().add(colNode);
-            		boxConstraintColumn.getList().add(boxNode);
             		
             		//	Set the 'up' reference for the column.
             		cellConstraintColumn.setUp(cellNode);
             		rowConstraintColumn.setUp(rowNode);
             		colConstraintColumn.setUp(colNode);
             		boxConstraintColumn.setUp(boxNode);
+            		
+            		//	Add the nodes to their respective column lists.
+            		cellConstraintColumn.getList().add(cellNode);
+            		rowConstraintColumn.getList().add(rowNode);
+            		colConstraintColumn.getList().add(colNode);
+            		boxConstraintColumn.getList().add(boxNode);
+            		
             		
             		//	Set the columns number of 1s it has
             		cellConstraintColumn.setNumberOfOnes(cellConstraintColumn.getNumberOfOnes() + 1);
@@ -237,34 +284,218 @@ public class DancingLinksSolver extends StdSudokuSolver
 		return columnList;
     }
     
-	private boolean recursiveSolve(LinkedList<ColumnNode> columnList, LinkedList<ColumnNode> coveredColumns) {
+	private boolean recursiveSolve(LinkedList<ColumnNode> columnList, SudokuGrid grid ) {
 		/*
 		 *	NOTES: need to uncover in reverse order.
 		 * 	-	Each column we cover will be stored in the coveredColumns linked list.
+		 *	-	Need to search for the first column with the least number of 1s.
 		 * 	-	Covering
+		 * 		-	columnNodes left and right references need to be updated.
  		 *		-	columnNodes will be inserted at the start of the coveredColumns linked list.
  		 *		-	All nodes the column has will perform 'unlinking' of the column links NOT row links.
  		 * 		-	Update the number of 1s in the col, by referencing the nodes columnNode. -=1
  		 *		-	Will add the cell to the partial answer grid.
 		 * 	-	Uncovering 
 		 * 		-	Columns will be uncovered in a LIFO (Last In First Out) order.
+		 * 		-	columnNodes left and right references need to be updated.
 		 * 		-	Every node the column has will go to its right, checking if the node above and below has a reference to it,
 		 * 			which if it does not will reset the link again. This process will stop once the nodesColumn ID matches up
 		 * 			again. In short it will do a full circle, checking and repairing links.
 		 * 		-	Each node that is repaired will update its columnNode. += 1
 		 * 		- 	When the node is uncovered (row/col) remove cell from partial answer grid.
-		 * 	-	Rinse and repeat untill grid is complete.
+		 * 	-	Rinse and repeat until grid is complete.
 		 */
 		
+		//	Initialize the count with the number of symbols allowed in the game. 
+		int leastOnesCount = symbolAmt;
 		
+		//	Create linkedList to hold columnNode we are going to cover
+    	LinkedList<ColumnNode> coveredColumns = new LinkedList<ColumnNode>();
+		
+		//	Need to hold reference of column.
+		ColumnNode leastOnesColumn = null;
+		
+		//	Need to start off at the offset as we don't want to include the master node in the loop.
+		for(int col = COL_LIST_OFFSET; col < columnList.size(); ++col) {
+			if(columnList.get(col).getNumberOfOnes() < leastOnesCount) {
+				leastOnesCount = columnList.get(col).getNumberOfOnes();
+				leastOnesColumn = columnList.get(col);
+			}
+		}
+		//	If leastOnesColumn is still null, it means that this is the first iteration. 
+		//	and the first column should be selected, as it is the first column with the least amount of ones.
+		if(leastOnesColumn == null) {
+			leastOnesColumn = columnList.get(COL_LIST_OFFSET);
+		}
+		
+		//	Select first node of the column
+		Node nodeSelected = leastOnesColumn.getDown();
+		
+		//	Get the columnID. Used to ensure unlinking of 'up' and 'down' references don't happen on this node in the row.
+		int nodeColumnID = nodeSelected.getColNode().getColumnID();
+		int nodeRowID = nodeSelected.getRowPosition();
+
+		System.out.println("col: " + nodeColumnID + " row: " + nodeRowID);
+		
+		//	Iterate through the nodes to the right until we loop back to the nodeSelected.
+		Node tempRowNode = nodeSelected;
+		
+		//	############ START COVER #############
+		
+		Node tempChosenCol = nodeSelected;
+		for(int i = 0; i < tempChosenCol.getColNode().getNumberOfOnes(); ++i) {
+			if(!tempChosenCol.getDown().getClass().equals(tempChosenCol.getColNode().getClass())){
+			}
+		}
+		
+		//	Cover other columns and rows
+		
+		coveredColumns.addFirst(tempRowNode.getColNode());
+		System.out.println("starting at colid: " + nodeSelected.getColNode().getColumnID());
+
+		for(int i = 0; i < symbolAmt; ++i) {
+			tempRowNode = tempRowNode.getRight();
+			if(!nodeSelected.equals(tempRowNode)) {
+				System.out.println("aaa: " + nodeSelected.getRowPosition());
+				Node tempColNode = tempRowNode;
+				System.out.println("B - covering column: " + tempRowNode.getColNode().getColumnID());
+				coveredColumns.addFirst(tempRowNode.getColNode());
+				coverColumnNode(tempRowNode.getColNode());
+				System.out.println("AS: " + tempRowNode.getColNode().getNumberOfOnes());
+				for(int j = 0; j < tempRowNode.getColNode().getNumberOfOnes(); ++j) {
+					//	Make sure we set the tempColNode to another node in the list and NOT the columnNode itself.
+					if(!tempColNode.getUp().getClass().equals(tempColNode.getColNode().getClass())){
+						tempColNode = tempColNode.getUp();
+					}else {
+						//	Skip over the columnNode.
+						tempColNode = tempColNode.getUp().getUp();
+					}
+					if(!tempRowNode.equals(tempColNode)) {
+						//	Cover the row Nodes
+						Node tempColRowNode = tempColNode;
+//						System.out.println("F - covering node col: " + 
+//								tempColNode.getColNode().getColumnID() + " node row: " + tempColNode.getRowPosition());
+						for(int l = 1; l < symbolAmt; ++l) {
+							tempColRowNode = tempColRowNode.getRight();
+							if(!tempRowNode.equals(tempColNode)) {
+							System.out.println("A - covering node col: " + 
+							tempColRowNode.getColNode().getColumnID() + " node row: " + tempColRowNode.getRowPosition());
+//							tempColRowNode.getColNode().setNumberOfOnes(tempColRowNode.getColNode().getNumberOfOnes() - 1);
+
+							coverNodeInRow(tempColRowNode);
+							}
+						}
+					}
+				}
+				//	Cover column
+				
+				//	Need to iterate through row
+				
+				
+				
+				//	Do 'up' and 'down' node dereferencing of node.
+//				System.out.println("DOES NOT EQUAL");
+//				System.out.println("C - col: " + tempRowNode.getColNode().getColumnID() + " row: " + tempRowNode.getRowPosition());
+
+			}
+			System.out.println("C - covering col: " + tempRowNode.getColNode().getColumnID() + " row: " + tempRowNode.getRowPosition());
+
+		}
+		
+		//	############ END COVER #############
+		printColumnNodes(columnList);
+		System.out.println("---------------------");
+		
+		//	############ START UNCOVER #############
+		
+		for(int numCols = 0; numCols < coveredColumns.size(); ++numCols) {
+			if(!leastOnesColumn.equals(coveredColumns.get(numCols))) {
+			nodeSelected = coveredColumns.get(numCols).getDown();
+			tempRowNode = nodeSelected;
+			System.out.println("x - " + nodeSelected.getRowPosition());
+			System.out.println("starting at colid: " + nodeSelected.getColNode().getColumnID());
+			
+			Node tempColNode = tempRowNode;
+			uncoverColumnNode(tempRowNode.getColNode());
+
+			for(int i = 0; i < tempColNode.getColNode().getNumberOfOnes(); ++i) {
+				if(!tempColNode.getDown().getClass().equals(tempColNode.getColNode().getClass())){
+					tempColNode = tempColNode.getDown();
+				}else {
+					//	Skip over the columnNode.
+					tempColNode = tempColNode.getDown().getDown();
+				}
+				if(!tempRowNode.equals(tempColNode)) {
+
+				Node tempColRowNode = tempColNode;
+
+				for(int l = 1; l < symbolAmt; ++l) {
+					if(!tempRowNode.equals(tempColNode)) {
+					tempColRowNode = tempColRowNode.getLeft();
+					System.out.println("A - covering node col: " + 
+					tempColRowNode.getColNode().getColumnID() + " node row: " + tempColRowNode.getRowPosition());
+//					tempColRowNode.getColNode().setNumberOfOnes(tempColRowNode.getColNode().getNumberOfOnes() + 1);
+
+					uncoverNodeInRow(tempColRowNode);
+					}
+				}
+				}
+					
+				System.out.println("C - covering col: " + tempRowNode.getColNode().getColumnID() + " row: " + tempRowNode.getRowPosition());
+	
+			}
+		}
+		}
+		
+
+		
+		//	############ END UNCOVER #############
+
+		
+		printColumnNodes(columnList);
+		System.out.println("==========");
+		for(int i = 0; i < coveredColumns.size(); i++) {
+			System.out.println("removed col IDs: " + coveredColumns.get(i).getColumnID());
+
+		}
 		boolean isValid = false;
 		
 		
-		
+		printColumnNodes(columnList);
+
 		
 		return isValid;
 	}
     
+	//	Covers and removes the 'up' and 'down' links to this Node in the columnNode linked list.
+	private void coverNodeInRow(Node nodeToCover) {
+		nodeToCover.getUp().setDown(nodeToCover.getDown());
+		nodeToCover.getDown().setUp(nodeToCover.getUp());
+		//	Remove one from the number of 1s in the column
+		nodeToCover.getColNode().setNumberOfOnes(nodeToCover.getColNode().getNumberOfOnes() - 1);
+	}
+	
+	//	Uncovers and resets the 'up' and 'down' links to this Node in the columnNode linked list.
+	private void uncoverNodeInRow(Node nodeToUncover) {
+		nodeToUncover.getUp().setDown(nodeToUncover);
+		nodeToUncover.getDown().setUp(nodeToUncover);
+		//	Add one from the number of 1s in the column
+		nodeToUncover.getColNode().setNumberOfOnes(nodeToUncover.getColNode().getNumberOfOnes() + 1);
+
+	}
+	
+	//	Covers and removes the 'left' and 'right' links to this columnNode in the columnList.
+	private void coverColumnNode(ColumnNode columnNodeToCover) {
+		columnNodeToCover.getLeft().setRight(columnNodeToCover.getRight());
+		columnNodeToCover.getRight().setLeft(columnNodeToCover.getLeft());
+	}
+	
+	//	Uncovers and resets the 'left' and 'right' links to this columnNode in the columnList.
+	private void uncoverColumnNode(ColumnNode columnNodeToUncover) {
+		columnNodeToUncover.getLeft().setRight(columnNodeToUncover);
+		columnNodeToUncover.getRight().setLeft(columnNodeToUncover);
+	}
+	
     //	DEBUG: prints column IDs and the number of 1s is holds
 	//	prints out the columns header ID
     private void printColumnNodes(LinkedList<ColumnNode> columnList) {
