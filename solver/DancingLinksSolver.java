@@ -328,110 +328,102 @@ public class DancingLinksSolver extends StdSudokuSolver
 			leastOnesColumn = columnList.get(COL_LIST_OFFSET);
 		}
 		
-		//	Select first node of the column
+		//	NOTES: Can probably create a for leep ( number of ones the leastOnesCol has) thus iterating each symbol.
+		//	Select first node of the column and hold references.
 		Node nodeSelected = leastOnesColumn.getDown();
-		
+		Node toNotTouch = leastOnesColumn.getDown();
 		//	Get the columnID. Used to ensure unlinking of 'up' and 'down' references don't happen on this node in the row.
-		int nodeColumnID = nodeSelected.getColNode().getColumnID();
-		int nodeRowID = nodeSelected.getRowPosition();
 
-		System.out.println("col: " + nodeColumnID + " row: " + nodeRowID);
-		
 		//	Iterate through the nodes to the right until we loop back to the nodeSelected.
 		Node tempRowNode = nodeSelected;
 		
-		//	############ START COVER #############
-		
-		Node tempChosenCol = nodeSelected;
-		for(int i = 0; i < tempChosenCol.getColNode().getNumberOfOnes(); ++i) {
-			if(!tempChosenCol.getDown().getClass().equals(tempChosenCol.getColNode().getClass())){
-			}
-		}
-		
-		//	Cover other columns and rows
-		
-		coveredColumns.addFirst(tempRowNode.getColNode());
-		System.out.println("starting at colid: " + nodeSelected.getColNode().getColumnID());
+		cover(nodeSelected, tempRowNode, toNotTouch, coveredColumns, grid);
+		uncover(nodeSelected, tempRowNode, toNotTouch, leastOnesColumn, coveredColumns, grid);
 
-		for(int i = 0; i < symbolAmt; ++i) {
-			tempRowNode = tempRowNode.getRight();
-			if(!nodeSelected.equals(tempRowNode)) {
-				System.out.println("aaa: " + nodeSelected.getRowPosition());
-				Node tempColNode = tempRowNode;
-				System.out.println("B - covering column: " + tempRowNode.getColNode().getColumnID());
-				coveredColumns.addFirst(tempRowNode.getColNode());
-				coverColumnNode(tempRowNode.getColNode());
-				System.out.println("AS: " + tempRowNode.getColNode().getNumberOfOnes());
-				for(int j = 0; j < tempRowNode.getColNode().getNumberOfOnes(); ++j) {
-					//	Make sure we set the tempColNode to another node in the list and NOT the columnNode itself.
-					if(!tempColNode.getUp().getClass().equals(tempColNode.getColNode().getClass())){
-						tempColNode = tempColNode.getUp();
-					}else {
-						//	Skip over the columnNode.
-						tempColNode = tempColNode.getUp().getUp();
-					}
-					if(!tempRowNode.equals(tempColNode)) {
-						//	Cover the row Nodes
-						Node tempColRowNode = tempColNode;
-//						System.out.println("F - covering node col: " + 
-//								tempColNode.getColNode().getColumnID() + " node row: " + tempColNode.getRowPosition());
-						for(int l = 1; l < symbolAmt; ++l) {
-							tempColRowNode = tempColRowNode.getRight();
-							if(!tempRowNode.equals(tempColNode)) {
-							System.out.println("A - covering node col: " + 
-							tempColRowNode.getColNode().getColumnID() + " node row: " + tempColRowNode.getRowPosition());
-//							tempColRowNode.getColNode().setNumberOfOnes(tempColRowNode.getColNode().getNumberOfOnes() - 1);
-
-							coverNodeInRow(tempColRowNode);
-							}
-						}
-					}
-				}
-				//	Cover column
-				
-				//	Need to iterate through row
-				
-				
-				
-				//	Do 'up' and 'down' node dereferencing of node.
-//				System.out.println("DOES NOT EQUAL");
-//				System.out.println("C - col: " + tempRowNode.getColNode().getColumnID() + " row: " + tempRowNode.getRowPosition());
-
-			}
-			System.out.println("C - covering col: " + tempRowNode.getColNode().getColumnID() + " row: " + tempRowNode.getRowPosition());
-
-		}
+		boolean isValid = false;
 		
-		//	############ END COVER #############
+		
 		printColumnNodes(columnList);
-		System.out.println("---------------------");
+
 		
-		//	############ START UNCOVER #############
+		return isValid;
+	}
+    
+	private void cover(Node nodeSelected, Node tempRowNode, Node toNotTouch, 
+			LinkedList<ColumnNode> coveredColumns, SudokuGrid grid) {
+//		############ START COVER #############
+
 		
+			//	Cover other columns and rows
+			
+			coveredColumns.addFirst(tempRowNode.getColNode());
+			System.out.println("starting at colid: " + nodeSelected.getColNode().getColumnID());
+
+			for(int i = 0; i < symbolAmt; ++i) {
+				tempRowNode = tempRowNode.getRight();
+				if(!nodeSelected.equals(tempRowNode)) {
+					System.out.println("aaa: " + nodeSelected.getRowPosition());
+					Node tempColNode = tempRowNode;
+					System.out.println("B - covering column: " + tempRowNode.getColNode().getColumnID());
+					coveredColumns.addFirst(tempRowNode.getColNode());
+					coverColumnNode(tempRowNode.getColNode());
+					System.out.println("AS: " + tempRowNode.getColNode().getNumberOfOnes());
+					for(int j = 0; j < tempRowNode.getColNode().getNumberOfOnes(); ++j) {
+						//	Make sure we set the tempColNode to another node in the list and NOT the columnNode itself.
+						if(!tempColNode.getUp().equals(tempColNode.getColNode())){
+							tempColNode = tempColNode.getUp();
+						}else {
+							//	Skip over the columnNode.
+							tempColNode = tempColNode.getColNode().getUp();
+						}
+							//	Cover the row Nodes
+							Node tempColRowNode = tempColNode;
+							for(int l = 1; l < symbolAmt; ++l) {
+								tempColRowNode = tempColRowNode.getRight();
+								if(!toNotTouch.equals(tempColRowNode)) {
+									System.out.println("A - covering node col: " + 
+											tempColRowNode.getColNode().getColumnID() + " node row: " + tempColRowNode.getRowPosition());
+									coverNodeInRow(tempColRowNode);
+								}
+							}
+					}
+					
+					//	Need to iterate through row
+				}
+				System.out.println("C - covering col: " + tempRowNode.getColNode().getColumnID() + " row: " + tempRowNode.getRowPosition());
+
+			}
+	}
+	
+	
+	private void uncover(Node nodeSelected, Node tempRowNode, Node toNotTouch, 
+			ColumnNode leastOnesColumn, LinkedList<ColumnNode> coveredColumns, SudokuGrid grid) {
 		for(int numCols = 0; numCols < coveredColumns.size(); ++numCols) {
+			nodeSelected = coveredColumns.get(numCols);
+			uncoverColumnNode(nodeSelected.getColNode());
+
 			if(!leastOnesColumn.equals(coveredColumns.get(numCols))) {
-			nodeSelected = coveredColumns.get(numCols).getDown();
 			tempRowNode = nodeSelected;
 			System.out.println("x - " + nodeSelected.getRowPosition());
 			System.out.println("starting at colid: " + nodeSelected.getColNode().getColumnID());
 			
 			Node tempColNode = tempRowNode;
-			uncoverColumnNode(tempRowNode.getColNode());
 
 			for(int i = 0; i < tempColNode.getColNode().getNumberOfOnes(); ++i) {
-				if(!tempColNode.getDown().getClass().equals(tempColNode.getColNode().getClass())){
+				if(!tempColNode.getDown().equals(tempColNode.getColNode())){
 					tempColNode = tempColNode.getDown();
 				}else {
 					//	Skip over the columnNode.
-					tempColNode = tempColNode.getDown().getDown();
+					tempColNode = tempColNode.getColNode().getDown();
 				}
-				if(!tempRowNode.equals(tempColNode)) {
+//				if(!tempRowNode.equals(tempColNode)) {
 
 				Node tempColRowNode = tempColNode;
 
 				for(int l = 1; l < symbolAmt; ++l) {
-					if(!tempRowNode.equals(tempColNode)) {
 					tempColRowNode = tempColRowNode.getLeft();
+					if(!toNotTouch.equals(tempColRowNode)) {
+
 					System.out.println("A - covering node col: " + 
 					tempColRowNode.getColNode().getColumnID() + " node row: " + tempColRowNode.getRowPosition());
 //					tempColRowNode.getColNode().setNumberOfOnes(tempColRowNode.getColNode().getNumberOfOnes() + 1);
@@ -443,30 +435,12 @@ public class DancingLinksSolver extends StdSudokuSolver
 					
 				System.out.println("C - covering col: " + tempRowNode.getColNode().getColumnID() + " row: " + tempRowNode.getRowPosition());
 	
-			}
+//			}
 		}
 		}
-		
-
-		
-		//	############ END UNCOVER #############
-
-		
-		printColumnNodes(columnList);
-		System.out.println("==========");
-		for(int i = 0; i < coveredColumns.size(); i++) {
-			System.out.println("removed col IDs: " + coveredColumns.get(i).getColumnID());
-
-		}
-		boolean isValid = false;
-		
-		
-		printColumnNodes(columnList);
-
-		
-		return isValid;
 	}
-    
+
+	
 	//	Covers and removes the 'up' and 'down' links to this Node in the columnNode linked list.
 	private void coverNodeInRow(Node nodeToCover) {
 		nodeToCover.getUp().setDown(nodeToCover.getDown());
