@@ -180,14 +180,14 @@ public class StdSudokuGrid extends SudokuGrid
 			for(int x = 0; x < gridSize; ++x) {
 				//check Row
 				for(int i = 0; i < getSize(); ++i) {
-					if(getCell(x, y) == getCell(x, i) && i != y) {
+					if(getCell(x, y) == getCell(x, i) && getCell(x, i) == null && i != y) {
 						System.out.println("Found a duplicate of: " + getCell(x, y) + " at position: " + x + "," + y);
 						return false;
 					}
 				}
 				//check Col
 				for(int i = 0; i < getSize(); ++i) {
-					if(getCell(x, y) == getCell(i, y) && i != x) {
+					if(getCell(x, y) == getCell(i, y) && getCell(i, y) == null && i != x) {
 						System.out.println("Found a duplicate of: " + getCell(x, y) + " at position: " + x + "," + y);
 						return false;
 					}

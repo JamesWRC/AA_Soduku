@@ -188,7 +188,6 @@ public class AlgorXSolver extends StdSudokuSolver
 			    				break;
 			    			}
 		    			}
-		    			
 		    			int possibleY = (int) Math.floor(count/symbolAmt);
 		    			if(possibleY > (symbolAmt-1)) {
 		    				col = 0;
@@ -221,14 +220,14 @@ public class AlgorXSolver extends StdSudokuSolver
 		    				}else {
 		    					return true;
 		    				}
-		    				//simply terminates unsuccessful of all cells contraint have been exhausted
+		    				//simply terminates unsuccessful of all cells conStraint have been exhausted
 		    				if(cell == partialSolution.getSymbols().length -1) {
 			    				partialSolution.setCell(getRealX, possibleY, null);	
 			    				return false;
 			    			}
 	
 		    			}else {
-		    				//simply terminates unsuccessfuly of all cells contraint have been exhausted
+		    				//simply terminates unsuccessfully of all cells conStraint have been exhausted
 		    				if(cell == partialSolution.getSymbols().length -1) {
 			    				partialSolution.setCell(getRealX, possibleY, null);
 			    				return false;

@@ -15,6 +15,7 @@ public class ColumnNode extends Node{
 	private int columnID = -1;								// 	The column number ID (name) this Node is in the cover 'matrix'.
 															//	Note: We need to initialize as a invalid id.	
 	public ColumnNode() {
+		super();
 		list = new LinkedList<Node>();
 //		list.add(new Node());
 	}
@@ -66,5 +67,14 @@ public class ColumnNode extends Node{
 	//	Set the list of Nodes this holds.
 	public void setList(LinkedList<Node> list){
 		this.list = list;
+	}
+	
+	//	Check if the ColumnNode is covered or not.
+	public boolean isCovered() {
+		boolean retVal = false;
+		if(numberOfOnes == 0) {
+			retVal = true;
+		}
+		return retVal;
 	}
 }
