@@ -47,7 +47,11 @@ public class DancingLinksSolver extends StdSudokuSolver
     	totalNumCols = (gridSize*gridSize) * NUM_OF_COL_CONSTRAINTS;
 
     	columnList = translateMatrixToCircular2DDoublyLinkedList(columnList, grid); // bit of a long method, but it is descriptive.
-//    	printColumnNodes(columnList);
+    	
+    	//	Check if grid is already solved
+    	if(grid.validate()) {
+    		return grid.validate();
+    	}
     	recursiveSolve(columnList, grid);
         return grid.validate();
     } // end of solve()
@@ -329,6 +333,7 @@ public class DancingLinksSolver extends StdSudokuSolver
     }
     
 	private boolean recursiveSolve(LinkedList<ColumnNode> columnList, SudokuGrid grid ) {
+
 		/*
 		 *	NOTES: need to uncover in reverse order.
 		 * 	-	Each column we cover will be stored in the coveredColumns linked list.

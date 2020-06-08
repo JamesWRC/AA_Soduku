@@ -1,9 +1,9 @@
 package grid;
 
 public class Cage {
-	/*	define -1 as an invalid number
-	 * 	since a cage could be a single cell that could be 0
-	 */
+	//	The distance from 0,0 in the grid. Used to sort cages in order of proximity starting at 0,0
+	private int distance = 0;
+	//	define 0 as an invalid number
 	private int cageSum = 0;
 	//holds array of cells that makes up the cage
 	private Integer[][] cells;
@@ -27,6 +27,13 @@ public class Cage {
 		return cells;
 	}
 	
+	public int getDistance() {
+		return distance;
+	}
+	
+	public void setDistance(int distance) {
+		this.distance = distance;
+	}
 	public void print() {
 		String retString = "";
 		for(int i = 0; i< cells.length; ++i) {
