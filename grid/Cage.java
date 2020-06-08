@@ -1,5 +1,4 @@
 package grid;
-import java.util.ArrayList;
 
 public class Cage {
 	/*	define -1 as an invalid number

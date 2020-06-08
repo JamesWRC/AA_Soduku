@@ -261,6 +261,14 @@ public class StdSudokuGrid extends SudokuGrid
 		}
 		return true;
 	}
+
+
+	@Override
+	public boolean validateCage(Cage cage) {
+		//	Do nothing as this grid / game type does not have any cages.
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 	
 } // end of class StdSudokuGrid

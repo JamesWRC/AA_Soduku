@@ -10,11 +10,11 @@ import grid.SudokuGrid;
 /**
  * Backtracking solver for standard Sudoku.
  */
-public class BackTrackingSolver extends StdSudokuSolver
+public class BackTrackingSolverOld extends StdSudokuSolver
 {
     // TODO: Add attributes as needed.
 	private int gameSize = 0;
-    public BackTrackingSolver() {
+    public BackTrackingSolverOld() {
         // TODO: any initialisation you want to implement.
     } // end of BackTrackingSolver()
 
@@ -100,7 +100,7 @@ public class BackTrackingSolver extends StdSudokuSolver
 	    			//if not null add to blacklist
 	    			if(grid.getCell(x, y) != null){
 		    	    	for(int l = 0; l < symbols.length; ++l) {
-		    	    		//null element in valid dymbols
+		    	    		//null element in valid symbols
 		    	    		if(grid.getCell(x, y).equals(symbols[l])) {		    	    			
 		    	    			symbols[l] = null;
 		    	    			--cellsInBoxLeft;

@@ -42,6 +42,7 @@ public class KillerSudokuGrid extends SudokuGrid
          //set up the game board which is initially 0*0
          game = new Integer[gridSize][gridSize];
          
+         
     } // end of KillerSudokuGrid()
 
 
@@ -153,7 +154,7 @@ public class KillerSudokuGrid extends SudokuGrid
     			//apply commas after all except last in row, 
     			//the one at the end will add a line break
     			if(j<game.length-1) {
-    				builder.append(", ");
+    				builder.append(",");
     			}else {
     				builder.append("\n");
     			}
@@ -165,10 +166,66 @@ public class KillerSudokuGrid extends SudokuGrid
 
     @Override
     public boolean validate() {
-        // TODO
-
-        // placeholder
-        return false;
+    	int gameSize = (int) Math.sqrt(getSize());
+    	int currX = 0;
+    	int currY = 0;
+    	int xLimit = gameSize;
+    	int yLimit = gameSize;
+    	boolean isValid = true;
+    	boolean boxIsValid = false;
+    	//ensure each box in the grid is valid 
+    	while(!boxIsValid) {
+			for(int index = 0; index < symbols.length; ++index) {
+				int cellCount = 0;
+				for(int y = currY; y < yLimit; ++y) {
+	    			for(int x = currX; x < xLimit; ++x) {	
+						if(symbols[index] == getCell(y,x)) {
+							cellCount++;
+						}						
+						//stopping condition. ie reached end of entire grid.
+						if(y == gridSize-1 && x == gridSize-1) {
+							boxIsValid = true;
+						}
+					}
+    			}
+				if(cellCount>1) {
+					System.out.println("Found a duplicate of: " + symbols[index] + "");
+					return false;
+				}
+			}
+			//set co-orodinates to move to next box in grid, left to right, top to bottom
+			if((currX + gameSize)<gridSize) {
+				xLimit+= gameSize;
+				currX+=gameSize;
+			}else if((currY + gameSize)<gridSize) {
+				currX = 0;
+				xLimit = gameSize;
+				yLimit+=gameSize;
+				currY+=gameSize;
+			}
+		}
+    	
+		
+		//verify rows and columns are unique
+		for(int y = 0; y < gridSize; ++y) {
+			for(int x = 0; x < gridSize; ++x) {
+				//check Row
+				for(int i = 0; i < getSize(); ++i) {
+					if(getCell(x, y) == getCell(x, i) && getCell(x, i) == null && i != y) {
+						System.out.println("Found a duplicate of: " + getCell(x, y) + " at position: " + x + "," + y);
+						return false;
+					}
+				}
+				//check Col
+				for(int i = 0; i < getSize(); ++i) {
+					if(getCell(x, y) == getCell(i, y) && getCell(i, y) == null && i != x) {
+						System.out.println("Found a duplicate of: " + getCell(x, y) + " at position: " + x + "," + y);
+						return false;
+					}
+				}
+			}
+		}
+        return isValid;
     } // end of validate()
 
 
@@ -205,8 +262,95 @@ public class KillerSudokuGrid extends SudokuGrid
 
 	@Override
 	public boolean verifyCell(int x, int y, int boxIDx, int boxIDy, Integer cellToPlace) {
-		// TODO Auto-generated method stub
-		return false;
+		int boxSize = (int) Math.sqrt(gridSize);
+		//verify cell placement is not already in the box.
+		for(int l = 0; l < symbols.length; ++l) {
+			int foundCount = 0;
+			for(int i = boxIDx; i < boxSize; ++i) {
+				for(int j = boxIDy; j < boxSize; ++j) {
+					if(getCell(i, j) == cellToPlace) {
+						return false;
+					}
+				}
+			}
+		}
+		//check row for duplicate symbol
+		for(int i = 0; i < getSize(); ++i) {
+			if(cellToPlace == getCell(i, y) && i != x) {
+				return false;
+			}
+		}
+		//check column for duplicate symbol
+		for(int i = 0; i < getSize(); ++i) {
+			if(cellToPlace == getCell(x, i) && i != y) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	public boolean validateCage(Cage cage) {
+		boolean isValid = false;
+		
+		Integer[][] cageCoordinates = cage.getCells();
+		int cageX = 0;
+		int cageY = 0;
+//		//	Check if all cells in cage has been filled in yet.
+//		for(int i = 0; i < cageCoordinates.length; ++i) {
+//			cageX = cageCoordinates[i][0];
+//			cageY = cageCoordinates[i][1];
+//			if(getCell(cageX, cageY) == null) {
+//				// Return true for now as the other cells in the grid are yet to be set.
+//				return true;
+//			}			
+//		}
+		
+		int cageSum = 0;
+
+		
+		//	Once cells have been checked. We need to see if the cells in the Cage are valid.
+		System.out.println(" checcking cage coordinates for value:");
+		for(int i = 0; i < cageCoordinates.length; ++i) {
+
+			cageX = cageCoordinates[i][0];
+			cageY = cageCoordinates[i][1];
+			System.out.println(cageCoordinates[i][0]+ "," + cageCoordinates[i][1] + " --> " + getCell(cageX, cageY));	
+
+			if(getCell(cageX, cageY) != null) {
+				// Return true for now as the other cells in the grid are yet to be set.
+				cageSum += getCell(cageX, cageY);
+			}
+		}
+		
+		if(cageSum == cage.getCageSum()) {
+			isValid = true;
+		}else {
+			System.out.println("\t\t ERROR: CAGE SUM IS INVALID! is: " + cageSum + " should be: " + cage.getCageSum());
+			//	The sum of the cells in cage do not match up to the required amount
+			return false;
+		}
+		
+		//	Check if there are duplicate cells in the cage
+		int cageCheckX = 0;
+		int cageCheckY = 0;
+		for(int i = 0; i < cageCoordinates.length; ++i) {
+			cageCheckX = cageCoordinates[i][0];
+			cageCheckY = cageCoordinates[i][1];
+			//	can improve efficiency, fix later.
+			for(int j = 0; j < cageCoordinates.length; ++j) {
+				cageX = cageCoordinates[j][0];
+				cageY = cageCoordinates[j][1];
+				if(i!=j && getCell(cageCheckX, cageCheckY) == getCell(cageX, cageY)) {
+//					System.out.println("FOUND DUPLICATE CELL IN GRID: " + 
+//				getCell(cageCheckX, cageCheckY) + " @ " + cageX + "," + cageY );
+					//	Found a duplicate, return false.
+					isValid = false;
+				}
+			}
+		}
+		
+		return isValid;
 	}
 
 

@@ -105,4 +105,12 @@ public abstract class SudokuGrid
 	 * @return
 	 */
 	public abstract boolean verifyCell(int x, int y, int boxIDx, int boxIDy, Integer cellToPlace);
+	
+	/**
+	 * 
+	 * @param cage - The current cage we are working with in the grid.
+	 * @return true or false if the cell placed in the grid is valid
+	 */
+	public abstract boolean validateCage(Cage cage);
+	
 } // end of abstract class SudokuGrid

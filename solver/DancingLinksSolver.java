@@ -16,7 +16,6 @@ public class DancingLinksSolver extends StdSudokuSolver
 {
 	private int gameSize = 0;
 	private int gridSize = 0;
-	private int totalNumRows = 0;
 	private int totalNumCols = 0;
 	private int symbolAmt = 0;
 	
@@ -26,18 +25,16 @@ public class DancingLinksSolver extends StdSudokuSolver
 	private static final int COL_LIST_OFFSET = 1;
 	private static final int MASTER_NODE_INDEX = 0;
 
-	private Integer[] possibleCells = null;
 	LinkedList<ColumnNode> coveredColumnsTest = new LinkedList<ColumnNode>(); //	Remove this later
 
 	//create arraylist
     public DancingLinksSolver() {
-        // TODO: any initialisation you want to implement.
+        // TODO: any initialization you want to implement.
     } // end of DancingLinksSolver()
 
 
     @Override
     public boolean solve(SudokuGrid grid) {
-    	possibleCells = new Integer[grid.getSymbols().length];
     	LinkedList<ColumnNode> columnList = null;
     	//set the size of boxes.
     	gameSize = (int) Math.sqrt(grid.getSize());
@@ -45,8 +42,7 @@ public class DancingLinksSolver extends StdSudokuSolver
     	gridSize = grid.getSize();
     	//set symbol amount
     	symbolAmt = grid.getSymbols().length;
-    	//rows = (gameSize*gameSize) * gameSize
-    	totalNumRows = (gridSize*gridSize) * gridSize;
+
     	//cols = (gameSize*gameSize) * NUM_OF_COL_CONSTRAINTS (4) <--num of col restrictions.
     	totalNumCols = (gridSize*gridSize) * NUM_OF_COL_CONSTRAINTS;
 
@@ -363,8 +359,7 @@ public class DancingLinksSolver extends StdSudokuSolver
 		//	Need to hold reference of column.
 		ColumnNode leastOnesColumn = columnList.get(MASTER_NODE_INDEX);
 		ColumnNode iterNode = columnList.get(MASTER_NODE_INDEX);
-		ColumnNode lastSelection = columnList.get(MASTER_NODE_INDEX);
-		ColumnNode currSelection = null;
+
 		
 		//	Need to start off at the offset as we don't want to include the master node in the loop.
 		for(int col = COL_LIST_OFFSET; col < columnList.size(); ++col) {
@@ -372,7 +367,6 @@ public class DancingLinksSolver extends StdSudokuSolver
 			if(iterNode.getNumberOfOnes() < leastOnesCount && iterNode.getNumberOfOnes() > 0) {
 				leastOnesColumn = iterNode;
 				leastOnesCount = iterNode.getNumberOfOnes();
-				currSelection = iterNode;
 			}
 		}
 
@@ -428,8 +422,6 @@ public class DancingLinksSolver extends StdSudokuSolver
 	    	}
 	    	//	Go one level down
 			boolean placedSuccessfully = recursiveSolve(columnList, grid);
-
-			lastSelection = leastOnesColumn;
 			isValid = placedSuccessfully;
 			
 			if(!placedSuccessfully) {
@@ -455,7 +447,6 @@ public class DancingLinksSolver extends StdSudokuSolver
 	private void cover(Node nodeSelected, Node tempRowNode, Node toNotTouch, 
 			LinkedList<ColumnNode> coveredColumns, SudokuGrid grid) {
 			//	Cover other columns and rows
-			Node temp = nodeSelected;
 
 //			if(!coveredColumns.contains(nodeSelected)) {
 			coverColumnNode(nodeSelected.getColNode(), coveredColumns);
@@ -611,46 +602,6 @@ public class DancingLinksSolver extends StdSudokuSolver
 		columnNodeToUncover.getRight().setLeft(columnNodeToUncover);
 	}
 	
-	
-	private boolean checkCover(LinkedList<ColumnNode> columnList, LinkedList<ColumnNode> coveredColumns, SudokuGrid grid) {
-		boolean allCovered = true;
-		if(!columnList.isEmpty()) {
-	    	ColumnNode itterNode = columnList.getFirst().getRight();
-	    	for(int col = 0; col <= totalNumCols; ++col) {
-    			itterNode = itterNode.getRight();
-		    		if(itterNode.getNumberOfOnes() != 0) {
-		    			allCovered = false;
-		    			
-		    		}
-	    	}
-    	}else {
-    		System.out.println("ERROR: columnList is empty!");
-    	}
-		return allCovered;
-	}
-	
-	
-    //	DEBUG: prints column IDs and the number of 1s is holds
-	//	prints out the columns header ID
-    private void printColumnNodes(LinkedList<ColumnNode> columnList) {
-    	//prints out the columns header ID
-    	if(!columnList.isEmpty()) {
-	    	ColumnNode itterNode = columnList.getFirst();
-	    	for(int col = 0; col <= totalNumCols; ++col) {
-		    		System.out.println("\n\tColumn ID: " + itterNode.getColumnID());
-		    		System.out.println("\t # of 1s: " + itterNode.getNumberOfOnes());
-		    		if(itterNode.getDown() != null)
-		    		System.out.println("row: " + itterNode.getDown().getRowPosition());
-		    		itterNode = itterNode.getRight();
-	
-	    	}
-    	}else {
-    		System.out.println("ERROR: columnList is empty!");
-    	}
-    }
-    
-    
-    
     private boolean allCovered(LinkedList<ColumnNode> columnList) {
 		ColumnNode tempIterNode = columnList.get(MASTER_NODE_INDEX);
 		boolean isAllCovered = true;
