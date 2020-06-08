@@ -13,71 +13,21 @@ import grid.SudokuGrid;
  */
 public class KillerBackTrackingSolver extends KillerSudokuSolver
 {
-    // TODO: Add attributes as needed.
 	private int gameSize = 0;
 	int[][] boxNumbers;
     public KillerBackTrackingSolver() {
-        // TODO: any initialisation you want to implement.
     } // end of KillerBackTrackingSolver()
 
 
     @Override
     public boolean solve(SudokuGrid grid) {
-        // TODO: your implementation of a backtracking solver for Killer Sudoku.
     	Cage[] cages = new Cage[grid.getCages().length];
 		System.arraycopy(grid.getCages(), 0, cages, 0, cages.length);		
 		
     	//	boxID is the index of the bottom left cell of the boxes in the game
     	gameSize = (int) Math.sqrt(grid.getSize());
 
-    	//	Fewest Possible Combinations Heuristic
-    	//	Sort the cages from lest number of cells to greatest.
-    	Cage[] orderedCages = new Cage[grid.getCages().length];
     	
-    	 boolean swapped = true;
-    	    int j = 0;
-    	    Cage tmp;
-    	    while (swapped) {
-    	        swapped = false;
-    	        j++;
-    	        for (int i = 0; i < cages.length - j; i++) {
-    	            if (cages[i].getCageSum() <= cages[i + 1].getCageSum()) {
-    	                tmp = cages[i];
-    	                cages[i] = cages[i + 1];
-    	                cages[i + 1] = tmp;
-    	                swapped = true;
-    	            }
-    	        }
-    	    }
-    	    
-    	    
- 	    for(int i =0; i < cages.length; ++i) {
- 	    	Integer[][] firstCellInCage = cages[i].getCells();
- 	    	int sumGrid = 0;
- 	    	for(int k = 0; k < firstCellInCage.length; ++k) {
- 	    		++sumGrid;
- 	    	}
-
- 	    	int value = (int) Math.pow(((firstCellInCage[0][0] * firstCellInCage[0][1])+sumGrid*i) * grid.getSize(),2);
- 	    	cages[i].setDistance(value);
- 	    }
- 	    
- 	    
-   	boolean cellswapped = true;
-	    int k = 0;
-	    Cage tmpCell;
-	    while (cellswapped) {
-	    	cellswapped = false;
-	        k++;
-	        for (int i = 0; i < cages.length - k; i++) {
-	            if (cages[i].getDistance() <= cages[i + 1].getDistance()) {
-	            	tmpCell = cages[i];
-	                cages[i] = cages[i + 1];
-	                cages[i + 1] = tmpCell;
-	                cellswapped = true;
-	            }
-	        }
-	    }
  	    
     	int cageIndex = 0;
     	int cageCoordinatesIndex = 0;
@@ -145,6 +95,7 @@ public class KillerBackTrackingSolver extends KillerSudokuSolver
 		//	See what is already used in the columns
 		//	Search row.
 
+		// 	Check what is already in the row
 		for(int k=0; k < grid.getSize(); ++k) {
 			if(grid.getCell(k, y) == tempSymbols[k]) {
 				tempSymbols[k] = null;
@@ -153,17 +104,19 @@ public class KillerBackTrackingSolver extends KillerSudokuSolver
 
 		symbols = tempSymbols;
 		
-		
+		//	Try a 'valid' symbol
 		for(int i = 0; i < symbols.length; ++i) {
 			if(symbols[i] != null) {
 				chosenSymbol = symbols[i];
 			}else {
 				continue;
-			}			
+			}		
+			//	Set cell
 			grid.setCell(x, y, chosenSymbol);
 
 
 
+			// veryify cell placement, row, col, and box
 			if(grid.verifyCell(x, y, boxIDx, boxIDy, chosenSymbol)) {
 
 				if(!placemnetLessThanCageValue(chosenCage, grid)){
@@ -171,10 +124,13 @@ public class KillerBackTrackingSolver extends KillerSudokuSolver
 
 					continue;
 				}else {
+					
 				cageCoordinatesIndex+=1;
 				}
+				//	Check if the cage is full to then be further tested.
 				if(isCageFull(chosenCage, grid)) {
 					
+					//	Validate the cage, if all filled, uinque numbers and sum up the required sum.
 					if(grid.validateCage(chosenCage)) {
 						
 						cageIndex+=1;
@@ -192,8 +148,10 @@ public class KillerBackTrackingSolver extends KillerSudokuSolver
 				}else {
 					
 				}
+				// Recursively go down another step.
 				boolean placementOk = true;
 				placementOk = recursiveBacktrack(grid, cageIndex, cageCoordinatesIndex, cages, count+1, cagesSatisfied);
+				//	Check if the the placement is ok or not
 				if(placementOk) {
 					return true;
 				}

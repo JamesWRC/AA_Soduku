@@ -275,7 +275,6 @@ public class KillerSudokuGrid extends SudokuGrid
 		//check row for duplicate symbol
 		for(int i = 0; i < getSize(); ++i) {
 			if(cellToPlace == getCell(i, y) && i != x) {
-//				System.out.println("BAD 2");
 
 				return false;
 			}
@@ -283,12 +282,10 @@ public class KillerSudokuGrid extends SudokuGrid
 		//check column for duplicate symbol
 		for(int i = 0; i < getSize(); ++i) {
 			if(cellToPlace == getCell(x, i) && i != y) {
-//				System.out.println("BAD 3");
 
 				return false;
 			}
 		}
-//		System.out.println("GOOD 1");
 
 		return true;
 	}
